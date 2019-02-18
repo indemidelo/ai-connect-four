@@ -5,6 +5,7 @@ class Board():
     def __init__(self):
         self.board = np.zeros((6, 7))
         self.playing = False
+        self.full = False
 
     def __repr__(self):
         print()
@@ -40,21 +41,21 @@ class Board():
 
     def check_connect(self, last_move):
         if self.horizontal_connect(last_move):
-            return f'{last_move.player} wins'
+            return f'Player {last_move.player} wins'
         if self.vertical_connect(last_move):
-            return f'{last_move.player} wins'
+            return f'Player {last_move.player} wins'
         if self.diagonal_connect(last_move):
-            return f'{last_move.player} wins'
+            return f'Player {last_move.player} wins'
         return None
 
     def winning_combo(self, combo, player):
-        print('combo', combo, 'player', player)
+        #print('combo', combo, 'player', player)
         return all(j == player for j in combo)
 
     def horizontal_connect(self, move):
         combo_start = max(0, move.col - 3)
         combo_end = min(6, move.col + 3)
-        print('Horizontal Combos')
+        #print('Horizontal Combos')
         for j in range(combo_end - combo_start - 2):
             combo = self.board[move.row, combo_start + j: combo_start + j + 4]
             if self.winning_combo(combo, move.player):
@@ -65,7 +66,7 @@ class Board():
     def vertical_connect(self, move):
         combo_start = max(0, move.row - 3)
         combo_end = min(5, move.row + 3)
-        print('Vertical Combos')
+        #print('Vertical Combos')
         for j in range(combo_end - combo_start - 2):
             combo = self.board[combo_start + j: combo_start + j + 4, move.col]
             if self.winning_combo(combo, move.player):
@@ -97,7 +98,7 @@ class Board():
         j_diag = min(move.col, move.row)
         combo_start = max(0, j_diag - 3)
         combo_end = min(len(diagonal) - 1, j_diag + 3)
-        print('Diagonal NW combos')
+        #print('Diagonal NW combos')
         for j in range(combo_end - combo_start - 2):
             combo = diagonal[combo_start + j: combo_start + j + 4]
             if self.winning_combo(combo, move.player):
@@ -116,7 +117,7 @@ class Board():
         j_diag = min(specular_col, move.row)
         combo_start = max(0, j_diag - 3)
         combo_end = min(len(diagonal) - 1, j_diag + 3)
-        print('Diagonal NE combos')
+        #print('Diagonal NE combos')
         for j in range(combo_end - combo_start - 2):
             combo = diagonal[combo_start + j: combo_start + j + 4]
             if self.winning_combo(combo, move.player):
