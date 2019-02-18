@@ -23,9 +23,12 @@ class GameBatch():
             rg.play_a_game()
             print(f'Player {rg.winner} won')
             actions, states, res = rg.export_final_results()
-            if res is 'ok':
-                self.states = np.append(self.states, states, axis=0)
-                self.actions = np.append(self.actions, actions, axis=0)
+            if res is 'ok' and b.plays > 3:
+                dim_s = states.shape[0]
+                last_states = states[np.array([dim_s-1])]
+                self.states = np.append(self.states, last_states, axis=0)
+                last_actions = actions[np.array([dim_s-1])]
+                self.actions = np.append(self.actions, last_actions, axis=0)
 
     def export_final_results(self):
         np.save(f'../states.npy', np.array(self.states))
@@ -36,7 +39,7 @@ if __name__ == '__main__':
     b = Board()
     p1 = Player(1, 'red', b)
     p2 = Player(2, 'yellow', b)
-    n_games = int(3e3)
+    n_games = int(5e3)
     batch = GameBatch(p1, p2, n_games)
     batch.fire()
     batch.export_final_results()
