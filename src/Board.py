@@ -5,7 +5,7 @@ class Board():
     def __init__(self):
         self.board = np.zeros((6, 7))
         self.playing = False
-        self.full = False
+        self.plays = 0
 
     def __repr__(self):
         print()
@@ -27,6 +27,7 @@ class Board():
         else:
             pos = self.find_free_spot(col)
             self.board[pos, col] = player
+            self.plays += 1
             return pos
 
     def find_free_spot(self, col):
@@ -41,12 +42,15 @@ class Board():
 
     def check_connect(self, last_move):
         if self.horizontal_connect(last_move):
-            return f'Player {last_move.player} wins'
+            #return f'Player {last_move.player} wins'
+            return True
         if self.vertical_connect(last_move):
-            return f'Player {last_move.player} wins'
+            #return f'Player {last_move.player} wins'
+            return True
         if self.diagonal_connect(last_move):
-            return f'Player {last_move.player} wins'
-        return None
+            #return f'Player {last_move.player} wins'
+            return True
+        return False
 
     def winning_combo(self, combo, player):
         #print('combo', combo, 'player', player)

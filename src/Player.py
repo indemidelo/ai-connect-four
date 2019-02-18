@@ -13,11 +13,10 @@ class Player():
         if col != -1:
             m = Move(self.name, self.board, col)
             m.play()
-            print(f'Player {self.name} played column {col}')
-            result = self.board.check_connect(m)
-            if result:
-                print(result)
-            return m
+            # print(f'Player {self.name} played column {col}')
+            win = self.board.check_connect(m)
+            # if result: print(result)
+            return m, win
         else:
             self.board.playing = False
             self.board.full = True

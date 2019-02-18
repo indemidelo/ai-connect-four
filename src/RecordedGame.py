@@ -15,22 +15,22 @@ class RecordedGame(Game):
 
     def play_a_game(self):
         self.board.playing = True
-        while self.board.playing:
+        while self.board.playing and self.board.plays < 42:
             self.history[1]['states'].append(self.board.board)
-            p1move = self.player_one.play()
+            p1move, win = self.player_one.play()
             self.history[1]['moves'].append(p1move.col)
-            if self.board.playing:
+            if win:
+                self.winner = 1
+                self.board.playing = False
+            elif self.board.plays < 42:
                 self.history[2]['states'].append(self.uniform_board())
-                p2move = self.player_two.play()
+                p2move, win = self.player_two.play()
                 self.history[2]['moves'].append(p2move.col)
-            elif not self.board.full:
-                self.winner = self.player_one.name
-            print(self.board)
-        if not self.winner and not self.board.full:
-            self.winner = self.player_two.name
-        elif not self.winner and self.board.full:
+                if win:
+                    self.winner = 2
+                    self.board.playing = False
+        if self.board.plays == 42:
             self.winner = 'TIE'
-            print('The game is a tie')
 
     def export_history(self, filename):
         if self.winner is not 'TIE':
@@ -52,7 +52,8 @@ class RecordedGame(Game):
         if self.winner is not 'TIE':
             moves = np.array(self.history[self.winner]['moves'])
             states = np.array(self.history[self.winner]['states'])
-            return moves, states
+            return moves, states, 'ok'
+        return None, None, 'tie'
 
 
 if __name__ == '__main__':
