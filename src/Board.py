@@ -4,6 +4,7 @@ import numpy as np
 class Board():
     def __init__(self):
         self.board = np.zeros((6, 7))
+        self.playing = False
 
     def __repr__(self):
         print()
@@ -57,6 +58,7 @@ class Board():
         for j in range(combo_end - combo_start - 2):
             combo = self.board[move.row, combo_start + j: combo_start + j + 4]
             if self.winning_combo(combo, move.player):
+                self.playing = False
                 return True
         return False
 
@@ -67,6 +69,7 @@ class Board():
         for j in range(combo_end - combo_start - 2):
             combo = self.board[combo_start + j: combo_start + j + 4, move.col]
             if self.winning_combo(combo, move.player):
+                self.playing = False
                 return True
         return False
 
@@ -98,6 +101,7 @@ class Board():
         for j in range(combo_end - combo_start - 2):
             combo = diagonal[combo_start + j: combo_start + j + 4]
             if self.winning_combo(combo, move.player):
+                self.playing = False
                 return True
         return False
 
@@ -116,5 +120,6 @@ class Board():
         for j in range(combo_end - combo_start - 2):
             combo = diagonal[combo_start + j: combo_start + j + 4]
             if self.winning_combo(combo, move.player):
+                self.playing = False
                 return True
         return False

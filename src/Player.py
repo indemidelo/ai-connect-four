@@ -17,7 +17,10 @@ class Player():
 
     def random_move(self):
         col = random.choice(range(0, 7))
-        return col
+        if 0 in self.board.board[:, col]:
+            return col
+        else:
+            return self.random_move()
 
     def fixed_move(self, fixed_move):
         if fixed_move == None:
