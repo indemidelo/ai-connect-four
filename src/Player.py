@@ -1,12 +1,15 @@
 import random
+import numpy as np
 from src.Move import Move
 
 
 class Player():
-    def __init__(self, name, color, board):
+    def __init__(self, name, color, board, model=None, qualcosa=None):
         self.name = name
         self.color = color
         self.board = board
+        self.model = model
+        self.qualcosa = qualcosa
 
     def play(self, fixed_move=None):
         col = self.fixed_move(fixed_move)
@@ -31,7 +34,8 @@ class Player():
     def random_move(self):
         available_moves = self.search_available_moves()
         if available_moves:
-            return random.choice(available_moves)
+            col = random.choice(available_moves)
+            return col
         else:
             return -1
 
@@ -40,3 +44,18 @@ class Player():
             return self.random_move()
         else:
             return fixed_move
+
+    def best_move(self):
+        if random.random() > self.qualcosa:
+            available_moves = self.search_available_moves()
+            rebased_board = self.board.board.reshape((1, 6, 7, 1))
+            probs = self.model.predict(rebased_board)
+            print(f'Player {self.name} had these choices: {probs}')
+            col = np.argmax(probs)
+            if col in available_moves:
+                return self.play(col)
+            else:
+                return self.play()
+        else:
+            return self.play()
+

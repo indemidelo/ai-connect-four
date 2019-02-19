@@ -20,9 +20,6 @@ class Game():
             # print(self.board)
         if not self.winner and not self.board.full:
             self.winner = self.player_two
-        elif not self.winner and self.board.full:
-            self.winner = 'TIE'
-            # print('The game is a tie')
 
 
 if __name__ == '__main__':
