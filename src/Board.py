@@ -16,7 +16,7 @@ class Board():
         for j in self.board:
             print(' |', end=' ')
             for i in j:
-                value = '1 ' if i == 1 else '2 ' if i == 2 else '_ '
+                value = 'O ' if i == 1 else 'X ' if i == 2 else '_ '
                 #value = f'{i} ' if i != 0 else '_ '
                 print(f'{value}|', end=' ')
             print()
