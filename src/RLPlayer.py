@@ -38,6 +38,7 @@ class RLPlayer():
 
     def mcts(self, moves):
         results = {col: 0 for col in moves}
+        wins = 0
         for col in moves:
             for j in range(self.n_iter):
                 new_b = deepcopy(self.board)
@@ -51,11 +52,14 @@ class RLPlayer():
                 #print(f'{n_new_plays} - {g.winner} %%', end=' ')
                 if g.winner == self.name:
                     results[col] += 0.9**n_new_plays
+                    wins += 1
                 elif g.winner is None:
                     results[col] += (0.5*0.9)**n_new_plays
                 else:
                     results[col] -= 0.9**(n_new_plays - 1)
         print(f'Player {self.name} results: {results}')
+        iter_tot = self.n_iter * len(results)
+        print(f'Player {self.name} P(win): {round(wins/iter_tot, 2)}%')
         return max(results.items(), key=lambda x: x[1])[0]
 
     def search_available_moves(self):

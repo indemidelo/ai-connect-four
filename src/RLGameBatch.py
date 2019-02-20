@@ -39,8 +39,8 @@ if __name__ == '__main__':
     random.seed(1)
     b = Board()
     n_rollout = 100
-    p1 = RLPlayer('1', b, n_rollout)
-    p2 = RLPlayer('2', b, n_rollout)
+    p1 = RLPlayer(1, b, n_rollout)
+    p2 = RLPlayer(2, b, n_rollout)
     n_games = 1
     batch = RLGameBatch(p1, p2, n_games)
     batch.fire(1, print_board=True)
