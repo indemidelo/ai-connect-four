@@ -46,8 +46,8 @@ class GameBatch():
 if __name__ == '__main__':
     b = Board()
     model = load_model('../my_first_model.h5')
-    p1 = Player(1, 'red', b, model, 0.001)
-    p2 = Player(2, 'yellow', b, model, 0.1)
+    p1 = Player(1, b, model, 0.001)
+    p2 = Player(2, b, model, 0.1)
     #n_games = int(5e3)
     n_games = 1
     batch = GameBatch(p1, p2, n_games)

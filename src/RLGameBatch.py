@@ -1,3 +1,4 @@
+import random
 import numpy as np
 from src.Game import Game
 from src.RLPlayer import RLPlayer
@@ -34,10 +35,11 @@ class RLGameBatch():
 
 
 if __name__ == '__main__':
+    random.seed(1)
     b = Board()
-    n_rollout = 10
-    p1 = RLPlayer(1, 'red', b, n_rollout)
-    p2 = Player(2, 'yellow', b)
-    n_games = 100
+    n_rollout = 500
+    p1 = RLPlayer(1, b, n_rollout)
+    p2 = RLPlayer(2, b, n_rollout)
+    n_games = 1
     batch = RLGameBatch(p1, p2, n_games)
-    batch.fire(1)
+    batch.fire(1, print_board=True)

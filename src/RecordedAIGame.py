@@ -15,7 +15,7 @@ class RecordedAIGame(Game):
         self.history[1] = {'moves': list(), 'states': list()}
         self.history[2] = {'moves': list(), 'states': list()}
 
-    def play_a_game(self):
+    def play_a_game(self, print_board=False, first_move=None):
         self.board.playing = True
         while self.board.playing and self.board.plays < 42:
             self.history[1]['states'].append(self.board.board)
@@ -61,8 +61,8 @@ class RecordedAIGame(Game):
 if __name__ == '__main__':
     b = Board()
     model = load_model('my_first_model.h5')
-    p1 = Player(1, 'red', b, model, 0.1)
-    p2 = Player(2, 'yellow', b, model, 0.1)
+    p1 = Player(1, b, model, 0.1)
+    p2 = Player(2, b, model, 0.1)
     g = RecordedAIGame(b, p1, p2)
     g.initialize()
     g.play_a_game()

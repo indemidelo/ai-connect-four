@@ -4,9 +4,8 @@ from src.Move import Move
 
 
 class Player():
-    def __init__(self, name, color, board, model=None, qualcosa=None):
+    def __init__(self, name, board, model=None, qualcosa=None):
         self.name = name
-        self.color = color
         self.board = board
         self.model = model
         self.qualcosa = qualcosa
@@ -16,9 +15,7 @@ class Player():
         if col != -1:
             m = Move(self.name, self.board, col)
             m.play()
-            # print(f'Player {self.name} played column {col}')
             win = self.board.check_connect(m)
-            # if result: print(result)
             return m, win
         else:
             self.board.playing = False

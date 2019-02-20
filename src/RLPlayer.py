@@ -3,14 +3,15 @@ from copy import deepcopy
 from src.Move import Move
 from src.Game import Game
 from src.Player import Player
+from src.OneMoveSmartPlayer import OneMoveSmartPlayer
 
 
 class RLPlayer():
-    def __init__(self, name, color, board, n_iter):
+    def __init__(self, name, board, n_iter, inside_game=False):
         self.name = name
-        self.color = color
         self.board = board
         self.n_iter = n_iter
+        self.inside_game = inside_game
 
     def play(self, fixed_move=None):
         if fixed_move is None:
@@ -40,20 +41,21 @@ class RLPlayer():
         results = {col: 0 for col in moves}
         for col in moves:
             for j in range(self.n_iter):
-                old_plays = self.board.plays
                 new_b = deepcopy(self.board)
-                p1dummy = Player(1, 'red', new_b)
-                p2dummy = Player(2, 'yellow', new_b)
+                p1dummy = Player(self.name, new_b, 1)
+                opponent = 1 if self.name == 2 else 2
+                #p2dummy = OneMoveSmartPlayer(opponent, new_b)
+                p2dummy = Player(opponent, new_b)
                 g = Game(new_b, p1dummy, p2dummy)
                 g.play_a_game(first_move=col)
-                n_new_plays = new_b.plays - old_plays
+                n_new_plays = new_b.plays - self.board.plays
                 if g.winner == self.name:
-                    results[col] += 1/n_new_plays
+                    results[col] += 0.9**n_new_plays
                 elif g.winner is None:
-                    results[col] += 0.5/n_new_plays
+                    results[col] += (0.5*0.9)**n_new_plays
                 else:
-                    results[col] -= 1/n_new_plays
-        giulio = None
+                    results[col] -= 0.9**(n_new_plays - 1)
+        print(f'Player {self.name} results: {results}')
         return max(results.items(), key=lambda x: x[1])[0]
 
     def search_available_moves(self):

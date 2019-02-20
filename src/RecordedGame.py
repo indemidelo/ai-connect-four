@@ -57,8 +57,8 @@ class RecordedGame(Game):
 
 if __name__ == '__main__':
     b = Board()
-    p1 = Player(1, 'red', b)
-    p2 = Player(2, 'yellow', b)
+    p1 = Player(1, b)
+    p2 = Player(2, b)
     g = RecordedGame(b, p1, p2)
     g.initialize()
     g.play_a_game()
