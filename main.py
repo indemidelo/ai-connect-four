@@ -1,16 +1,12 @@
 from src.Board import Board
-from src.Player import Player
+from src.HumanPlayer import HumanPlayer
+from src.Game import Game
+from src.RLPlayer import RLPlayer
 
 if __name__ == '__main__':
+    print('Human plays as 1 and PC as 2')
     b = Board()
-    p1 = Player(1, b)
-    p2 = Player(2, b)
-    p1.play(4)
-    p2.play(2)
-    print(b)
-    p1.play(4)
-    p2.play(3)
-    print(b)
-    #p1.play(3)
-    #p2.play(3)
-    #print(b)
+    human = HumanPlayer(1, b)
+    ai = RLPlayer('2', b, 500)
+    g = Game(b, human, ai)
+    g.play_a_game(print_board=True)

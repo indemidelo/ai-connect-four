@@ -29,17 +29,18 @@ class RLGameBatch():
                 print(f'Player {g.winner} won')
             if g.winner is not None:
                 self.results[g.winner] += 1
-        print(f'Player {self.player_one.name} won {self.results[self.player_one.name]} time'
-              f's\nPlayer {self.player_two.name} won {self.results[self.player_two.name]} tim'
-              f'es')
+        print(f'Player {self.player_one.name} won'
+              f' {self.results[self.player_one.name]} times\n'
+              f'Player {self.player_two.name} won'
+              f' {self.results[self.player_two.name]} times')
 
 
 if __name__ == '__main__':
     random.seed(1)
     b = Board()
-    n_rollout = 500
-    p1 = RLPlayer(1, b, n_rollout)
-    p2 = RLPlayer(2, b, n_rollout)
+    n_rollout = 100
+    p1 = RLPlayer('1', b, n_rollout)
+    p2 = RLPlayer('2', b, n_rollout)
     n_games = 1
     batch = RLGameBatch(p1, p2, n_games)
     batch.fire(1, print_board=True)

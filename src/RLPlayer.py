@@ -7,11 +7,10 @@ from src.OneMoveSmartPlayer import OneMoveSmartPlayer
 
 
 class RLPlayer():
-    def __init__(self, name, board, n_iter, inside_game=False):
+    def __init__(self, name, board, n_iter):
         self.name = name
         self.board = board
         self.n_iter = n_iter
-        self.inside_game = inside_game
 
     def play(self, fixed_move=None):
         if fixed_move is None:
@@ -49,6 +48,7 @@ class RLPlayer():
                 g = Game(new_b, p1dummy, p2dummy)
                 g.play_a_game(first_move=col)
                 n_new_plays = new_b.plays - self.board.plays
+                #print(f'{n_new_plays} - {g.winner} %%', end=' ')
                 if g.winner == self.name:
                     results[col] += 0.9**n_new_plays
                 elif g.winner is None:

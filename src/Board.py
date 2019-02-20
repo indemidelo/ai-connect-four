@@ -17,9 +17,10 @@ class Board():
             print(' |', end=' ')
             for i in j:
                 value = '1 ' if i == 1 else '2 ' if i == 2 else '_ '
+                #value = f'{i} ' if i != 0 else '_ '
                 print(f'{value}|', end=' ')
             print()
-        print('-------------------------------')
+        print('---1---2---3---4---5---6---7---')
         return ''
 
     def play_(self, player, col):
