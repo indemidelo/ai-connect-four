@@ -9,17 +9,26 @@ class Game():
         self.player_two = player_two
         self.winner = None
 
-    def play_a_game(self):
+    def play_a_game(self, print_board=False, first_move=None):
         self.board.playing = True
-        while self.board.playing:
-            self.player_one.play()
-            if self.board.playing:
-                self.player_two.play()
+        while self.board.playing and not self.board.full:
+            if first_move is not None:
+                p1move, win = self.player_one.play(first_move)
+                first_move = None
+            else:
+                p1move, win = self.player_one.play()
+            if print_board:
+                print(self.board)
+            if win:
+                self.winner = 1
+                self.board.playing = False
             elif not self.board.full:
-                self.winner = self.player_one
-            # print(self.board)
-        if not self.winner and not self.board.full:
-            self.winner = self.player_two
+                p2move, win = self.player_two.play()
+                if print_board:
+                    print(self.board)
+                if win:
+                    self.winner = 2
+                    self.board.playing = False
 
 
 if __name__ == '__main__':

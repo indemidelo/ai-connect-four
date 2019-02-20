@@ -9,6 +9,7 @@ class RecordedAIGame(Game):
     def __init__(self, board, player_one, player_two):
         Game.__init__(self, board, player_one, player_two)
         self.history = dict()
+        self.winner = None
 
     def initialize(self):
         self.history[1] = {'moves': list(), 'states': list()}
@@ -27,14 +28,11 @@ class RecordedAIGame(Game):
             elif self.board.plays < 42:
                 self.history[2]['states'].append(self.uniform_board())
                 p2move, win = self.player_two.play()
-                #p2move, win = self.player_two.best_move()
                 self.history[2]['moves'].append(p2move.col)
                 print(self.board)
                 if win:
                     self.winner = 2
                     self.board.playing = False
-        if self.board.plays == 42:
-            self.winner = None
 
     def export_history(self, filename):
         if self.winner is not None:
