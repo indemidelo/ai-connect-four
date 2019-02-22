@@ -26,9 +26,13 @@ class HumanPlayer():
 
     def human_move(self):
         available_moves = self.search_available_moves()
-        col = int(input('Your move:')) - 1
+        try:
+            col = int(input('Your move:')) - 1
+        except:
+            print('Invalid move! Column not found')
+            return self.human_move()
         if col in available_moves:
             return col
-        else:
-            print('Invalid move! The column is full')
-            return self.human_move()
+        print('Invalid move! The column is full')
+        return self.human_move()
+
