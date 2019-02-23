@@ -29,12 +29,12 @@ def train(input_size: int, hidden_size: int, num_classes: int,
     model = Sequential()
     model.add(Conv2D(hidden_size, kernel_size=(3, 3), activation='relu',
                      input_shape=(2, 6, 7), data_format='channels_first'))
-    model.add(ReLU())
+    # model.add(ReLU())
     model.add(BatchNormalization())
     model.add(Flatten())
-    model.add(Dense(56))
-    model.add(Dense(28))
-    model.add(Dense(14))
+    # model.add(Dense(56))
+    # model.add(Dense(28))
+    # model.add(Dense(14))
     model.add(Dense(7, kernel_initializer='normal'))
 
     model.compile(loss=keras.losses.mean_squared_error, optimizer='adam', metrics=['accuracy'])
