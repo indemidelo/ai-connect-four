@@ -28,8 +28,10 @@ class NNPlayer():
     def nn_move(self):
         available_moves = self.board.list_available_moves()
         #nn_policy = self.model(self.board.board_as_tensor(self.name))
-        nn_policy = self.model.predict(self.board.board_as_tensor(self.name)).flatten()
+        nn_policy = self.model.predict(
+            self.board.board_as_tensor(self.name), verbose=False).flatten()
         nn_policy = {j: max(0, v) for j, v in enumerate(nn_policy)}
+        print(f'Player {self.name} policy: {nn_policy}')
         if not available_moves:
             return -1
         weight_ko_moves = sum([v for k, v in enumerate(nn_policy) if
@@ -42,6 +44,6 @@ class NNPlayer():
             return random.choices(list(nn_policy_ok.keys()),
                                   list(nn_policy_ok.values()))[0]
         else:
-            best_move = sorted(nn_policy_ok.items(), key=lambda x: x[1])[-1]
+            best_move = sorted(nn_policy_ok.items(), key=lambda x: x[1])[-1][0]
             return best_move
 

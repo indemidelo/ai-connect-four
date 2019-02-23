@@ -1,6 +1,8 @@
 #from src.train import train
 from src.Board import Board
 from src.HumanPlayer import HumanPlayer
+from src.NNPlayer import NNPlayer
+from src.NNGame import NNRecordedGame
 from src.Game import Game
 from src.RLPlayer import RLPlayer
 from src.train_tensorflow import train
@@ -19,12 +21,19 @@ if __name__ == '__main__':
     input_size = 2
     hidden_size = 256
     num_classes = 7
-    num_epochs = 5
+    num_epochs = 50
+    num_games = 250
     batch_size = 4
     learning_rate = 0.001
-    mcts_iter = 50
-    train(input_size, hidden_size, num_classes, num_epochs,
-          batch_size, learning_rate, mcts_iter)
+    mcts_iter = 250
+    model = train(input_size, hidden_size, num_classes, num_epochs,
+                  num_games, batch_size, learning_rate, mcts_iter)
 
+    print('\n\nSample Game\n\n')
+    b = Board()
+    p1 = NNPlayer(1, b, model, training=False)
+    p2 = NNPlayer(2, b, model, training=False)
 
-
+    nn_g = NNRecordedGame(b, p1, p2, mcts_iter, device=None)
+    nn_g.initialize_history()
+    nn_g.play_a_game(print_board=True)

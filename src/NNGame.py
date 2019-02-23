@@ -30,18 +30,22 @@ class NNRecordedGame():
     def play_a_game(self, print_board=False, first_move=None):
         """ To play a game """
         while self.board.playing and not self.board.full:
-            if print_board:
-                print(self.board)
             if first_move is not None:
                 p1move, win = self.player_one.play(first_move)
                 first_move = None
             else:
                 win = self.turn(self.player_one)
+                if print_board:
+                    print(f'Player {self.player_one.name} move')
+                    print(self.board)
             if win:
                 self.winner = self.player_one.name
                 self.board.playing = False
             elif not self.board.full:
                 win = self.turn(self.player_two)
+                if print_board:
+                    print(f'Player {self.player_two.name} move')
+                    print(self.board)
                 if win:
                     self.winner = self.player_two.name
                     self.board.playing = False
