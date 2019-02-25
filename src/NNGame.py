@@ -56,8 +56,9 @@ class NNRecordedGame():
         state = self.board.board_as_tensor(player.name)
         #state = state.to(self.device, dtype=torch.float64)
         self.history[player.name]['states'].append(state)
-        rollout_policy = MonteCarloTreeSearch(
-            self.board, player, self.n_iter).rollout_pol
+        mcts = MonteCarloTreeSearch(self.board, player, self.n_iter)
+        mcts.tree_search()
+        rollout_policy = mcts.rollout_pol
         roll_pol = [0] * len(rollout_policy)
         for k, v in rollout_policy.items():
             roll_pol[k] = v

@@ -44,22 +44,21 @@ class RLPlayer():
                 new_b = deepcopy(self.board)
                 p1dummy = Player(self.name, new_b, 1)
                 opponent = 1 if self.name == 2 else 2
-                #p2dummy = OneMoveSmartPlayer(opponent, new_b)
                 p2dummy = Player(opponent, new_b)
                 g = Game(new_b, p1dummy, p2dummy)
                 g.play_a_game(first_move=col)
                 n_new_plays = new_b.plays - self.board.plays
-                #print(f'{n_new_plays} - {g.winner} %%', end=' ')
                 if g.winner == self.name:
-                    results[col] += 0.9**n_new_plays
+                    results[col] += 0.9 ** n_new_plays
                     wins += 1
                 elif g.winner is None:
-                    results[col] += (0.5*0.9)**n_new_plays
+                    results[col] += (0.5 * 0.9) ** n_new_plays
                 else:
-                    results[col] -= 0.9**(n_new_plays - 1)
+                    results[col] -= 0.9 ** (n_new_plays - 1)
         print(f'Player {self.name} results: {results}')
         iter_tot = self.n_iter * len(results)
-        print(f'Player {self.name} P(win): {round(wins/iter_tot, 2)}%')
+        print(f'Player {self.name} P(win):'
+              f' {round(wins / iter_tot * 100, 2)}%')
         return max(results.items(), key=lambda x: x[1])[0]
 
     def search_available_moves(self):

@@ -16,8 +16,8 @@ def sample_player_moves(nn_game, player, batch_size):
     for j in sampled_indices:
         input_data.append((nn_game.history[player.name]['states'][j]))
         output_data.append(nn_game.history[player.name]['rollout_pol'][j])
-    input_data = np.asarray(input_data).reshape((4, 2, 6, 7))
-    output_data = np.asarray(input_data).reshape((4, 2, 6, 7))
+    input_data = np.asarray(input_data).reshape((4, 6, 7, 2))
+    output_data = np.asarray(output_data).reshape((4, 7))
     return input_data, output_data
 
 
@@ -27,9 +27,17 @@ def train(input_size: int, hidden_size: int, num_classes: int,
     # Device configuration
 
     model = Sequential()
-    model.add(Conv2D(hidden_size, kernel_size=(3, 3), activation='relu',
-                     input_shape=(2, 6, 7), data_format='channels_first'))
-    # model.add(ReLU())
+    model.add(Conv2D(hidden_size, kernel_size=(4, 4), activation='relu',
+                     padding='same', input_shape=(6, 7, 2),
+                     kernel_initializer='normal'))
+    model.add(BatchNormalization())
+    model.add(Conv2D(hidden_size, kernel_size=(4, 4),
+                     padding='same', activation='relu',
+                     kernel_initializer='normal'))
+    model.add(BatchNormalization())
+    model.add(Conv2D(hidden_size, kernel_size=(4, 4),
+                     padding='same', activation='relu',
+                     kernel_initializer='normal'))
     model.add(BatchNormalization())
     model.add(Flatten())
     # model.add(Dense(56))
@@ -37,10 +45,11 @@ def train(input_size: int, hidden_size: int, num_classes: int,
     # model.add(Dense(14))
     model.add(Dense(7, kernel_initializer='normal'))
 
-    model.compile(loss=keras.losses.mean_squared_error, optimizer='adam', metrics=['accuracy'])
+    model.compile(loss=keras.losses.mean_squared_error,
+                  optimizer='adam', metrics=['accuracy'])
 
     # Train the model
-    for _ in range(num_games):
+    for e in range(num_games):
 
         # Prepare the game
         b = Board()
@@ -68,6 +77,11 @@ def train(input_size: int, hidden_size: int, num_classes: int,
         # build the batch
         batch = [input_data, output_data]
 
-        model.fit(batch[0], batch[1], batch_size=batch_size, epochs=num_epochs, verbose=1)
+        # print('input data', input_data)
+        # print('output data', output_data)
+        model.fit(batch[0], batch[1], batch_size=batch_size,
+                  epochs=num_epochs * (e + 1),
+                  initial_epoch=num_epochs * e,
+                  verbose=1)
 
     return model

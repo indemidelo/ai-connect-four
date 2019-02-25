@@ -16,7 +16,7 @@ class MonteCarloTreeSearch():
        for col in available_moves:
            for j in range(self.n_iter):
                new_b = deepcopy(self.board)
-               nn_policy = self.player.nn_policy
+               nn_policy = self.player.model
                p1dummy = NNPlayer(self.player.name, new_b, nn_policy, True)
                opponent = 1 if self.player.name == 2 else 2
                p2dummy = NNPlayer(opponent, new_b, nn_policy, True)

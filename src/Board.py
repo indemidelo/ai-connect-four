@@ -173,11 +173,11 @@ class Board():
             player_matrix = np.ones((6, 7))
             #return torch.tensor((p1board, player_matrix)).reshape(-1, 2, 6, 7)
             #return torch.tensor((p1board, player_matrix)).reshape(1, 2, 6, 7)
-            return np.array((p1board, player_matrix)).reshape((1, 2, 6, 7))
+            return np.array((p1board, player_matrix)).reshape((1, 6, 7, 2))
         else:
             player_matrix = np.zeros((6, 7))
             #return torch.tensor((p2board, player_matrix)).reshape(1, 2, 6, 7)
-            return np.array((p2board, player_matrix)).reshape((1, 2, 6, 7))
+            return np.array((p2board, player_matrix)).reshape((1, 6, 7, 2))
 
 
 
