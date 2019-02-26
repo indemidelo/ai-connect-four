@@ -1,5 +1,5 @@
 #import torch
-from src.MTCS import MonteCarloTreeSearch
+from src.MCTS import MonteCarloTreeSearch
 
 
 class NNRecordedGame():
@@ -57,14 +57,13 @@ class NNRecordedGame():
         #state = state.to(self.device, dtype=torch.float64)
         self.history[player.name]['states'].append(state)
         mcts = MonteCarloTreeSearch(self.board, player, self.n_iter)
-        mcts.tree_search()
-        rollout_policy = mcts.rollout_pol
+        rollout_policy = mcts.tree_search()
         roll_pol = [0] * len(rollout_policy)
         for k, v in rollout_policy.items():
             roll_pol[k] = v
         self.history[player.name]['rollout_pol'].append(roll_pol)
         move, win = player.play()
-        self.history[player.name]['moves'].append(move.col)
+        #self.history[player.name]['moves'].append(move.col)
         return win
 
     def one_move(self, move):

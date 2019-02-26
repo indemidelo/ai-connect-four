@@ -21,14 +21,10 @@ def sample_player_moves(nn_game, player, batch_size):
     return input_data, output_data
 
 
-def train(input_size: int, hidden_size: int, num_classes: int,
-          num_epochs: int, num_games: int, batch_size: int,
-          learning_rate: float, mcts_iter: int):
-    # Device configuration
-
+def model_structure(hidden_size, input_shape):
     model = Sequential()
     model.add(Conv2D(hidden_size, kernel_size=(4, 4), activation='relu',
-                     padding='same', input_shape=(6, 7, 2),
+                     padding='same', input_shape=input_shape,
                      kernel_initializer='normal'))
     model.add(BatchNormalization())
     model.add(Conv2D(hidden_size, kernel_size=(4, 4),
@@ -40,21 +36,27 @@ def train(input_size: int, hidden_size: int, num_classes: int,
                      kernel_initializer='normal'))
     model.add(BatchNormalization())
     model.add(Flatten())
-    # model.add(Dense(56))
-    # model.add(Dense(28))
-    # model.add(Dense(14))
     model.add(Dense(7, kernel_initializer='normal'))
 
     model.compile(loss=keras.losses.mean_squared_error,
                   optimizer='adam', metrics=['accuracy'])
+    return model
+
+
+def train(input_size: int, hidden_size: int, num_classes: int,
+          num_epochs: int, num_games: int, batch_size: int,
+          learning_rate: float, mcts_iter: int):
+    # Create the model
+    input_shape = (6, 7, 2)
+    model = model_structure(hidden_size, input_shape)
 
     # Train the model
     for e in range(num_games):
 
-        # Prepare the game
+        # Create the board
         b = Board()
 
-        # use output = model(stage) to get P
+        # Create the players and the game
         p1 = NNPlayer(1, b, model, training=True)
         p2 = NNPlayer(2, b, model, training=True)
         nn_g = NNRecordedGame(b, p1, p2, mcts_iter, device=None)
