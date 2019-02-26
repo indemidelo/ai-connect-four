@@ -1,9 +1,10 @@
 #import torch
-from src.MCTS import MonteCarloTreeSearch
+from multiprocessing import Queue
+from src.MCTSArch import MonteCarloTreeSearchArch
 
 
-class NNRecordedGame():
-    def __init__(self, board, player_one, player_two, n_iter):
+class NNRecordedGame_mp():
+    def __init__(self, board, player_one, player_two, mcts_iter):
         """
         A game of n-connect
         :param board:
@@ -13,18 +14,20 @@ class NNRecordedGame():
         self.board = board
         self.player_one = player_one
         self.player_two = player_two
-        self.n_iter = n_iter
         self.winner = None
         self.board.playing = True
+        self.mcts = MonteCarloTreeSearchArch(mcts_iter)
+        self.queues_in = [Queue() for _ in range(7)]
+        self.queues_out = [Queue() for _ in range(7)]
+        self.processes = list()
         self.history = dict()
 
     def initialize(self):
         self.history[self.player_one.name] = {
-            'moves': list(), 'states': list(), 'rollout_pol': list()
-        }
+            'moves': list(), 'states': list(), 'rollout_pol': list()}
         self.history[self.player_two.name] = {
-            'moves': list(), 'states': list(), 'rollout_pol': list()
-        }
+            'moves': list(), 'states': list(), 'rollout_pol': list()}
+        self.mcts.initialize()
 
     def play_a_game(self, print_board=False, first_move=None):
         """ To play a game """
@@ -55,19 +58,8 @@ class NNRecordedGame():
         state = self.board.board_as_tensor(player.name)
         #state = state.to(self.device, dtype=torch.float64)
         self.history[player.name]['states'].append(state)
-        mcts = MonteCarloTreeSearch(self.board, player, self.n_iter)
-        rollout_policy = mcts.tree_search()
-        roll_pol = [0] * len(rollout_policy)
-        for k, v in rollout_policy.items():
-            roll_pol[k] = v
-        self.history[player.name]['rollout_pol'].append(roll_pol)
+        rollout_policy = self.mcts.tree_search(self.board, player)
+        self.history[player.name]['rollout_pol'].append(rollout_policy)
         move, win = player.play()
         #self.history[player.name]['moves'].append(move.col)
         return win
-
-    def one_move(self, move):
-        if self.board.playing and not self.board.full:
-            p1move, win = self.player_one.play(move)
-            if win:
-                self.winner = self.player_one.name
-                self.board.playing = False
