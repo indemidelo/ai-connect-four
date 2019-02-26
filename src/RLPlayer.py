@@ -54,8 +54,9 @@ class RLPlayer():
                 elif g.winner is None:
                     results[col] += (0.5 * 0.9) ** n_new_plays
                 else:
-                    results[col] -= 0.9 ** (n_new_plays - 1)
-        print(f'Player {self.name} results: {results}')
+                    results[col] -= 0.9**(n_new_plays - 1)
+        rounded_res = {col:round(result, 2) for col, result in results.items()}
+        print(f'Player {self.name} results: {rounded_res}')
         iter_tot = self.n_iter * len(results)
         print(f'Player {self.name} P(win):'
               f' {round(wins / iter_tot * 100, 2)}%')

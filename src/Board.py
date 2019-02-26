@@ -2,6 +2,19 @@
 import numpy as np
 
 
+class bcolors:
+    CYANO = '\033[96m'
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    GRAY = '\033[90m'
+    UNDERLINE = '\033[4m'
+    BOLD = '\033[1m'
+    ENDC = '\033[0m'
+
+
 class Board():
     def __init__(self, rows=6, columns=7):
         self.board = np.zeros((rows, columns), dtype=float)
@@ -12,13 +25,14 @@ class Board():
     def __repr__(self):
         print()
         print('-------------------------------')
-        print('-----------THE BOARD-----------')
+        print(f'-----------{bcolors.HEADER}THE BOARD{bcolors.ENDC}-----------')
         print('-------------------------------')
         for j in self.board:
             print(' |', end=' ')
             for i in j:
-                value = 'O ' if i == 1 else 'X ' if i == 2 else '_ '
-                #value = f'{i} ' if i != 0 else '_ '
+                value = f'{bcolors.OKBLUE}O {bcolors.ENDC}' if i == 1 else f'{bcolors.RED}X {bcolors.ENDC}' \
+                    if i == 2 else f'{bcolors.GRAY}_ {bcolors.ENDC}'
+                # value = f'{i} ' if i != 0 else '_ '
                 print(f'{value}|', end=' ')
             print()
         print('---1---2---3---4---5---6---7---')
