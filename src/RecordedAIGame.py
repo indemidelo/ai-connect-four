@@ -1,10 +1,11 @@
 import numpy as np
+from keras.models import load_model
 from src.Player import Player
 from src.Game import Game
 from src.Board import Board
 
 
-class RecordedGame(Game):
+class RecordedAIGame(Game):
     def __init__(self, board, player_one, player_two):
         Game.__init__(self, board, player_one, player_two)
         self.history = dict()
@@ -14,12 +15,13 @@ class RecordedGame(Game):
         self.history[1] = {'moves': list(), 'states': list()}
         self.history[2] = {'moves': list(), 'states': list()}
 
-    def play_a_game(self):
+    def play_a_game(self, print_board=False, first_move=None):
         self.board.playing = True
         while self.board.playing and self.board.plays < 42:
             self.history[1]['states'].append(self.board.board)
-            p1move, win = self.player_one.play()
+            p1move, win = self.player_one.best_move()
             self.history[1]['moves'].append(p1move.col)
+            print(self.board)
             if win:
                 self.winner = 1
                 self.board.playing = False
@@ -27,6 +29,7 @@ class RecordedGame(Game):
                 self.history[2]['states'].append(self.uniform_board())
                 p2move, win = self.player_two.play()
                 self.history[2]['moves'].append(p2move.col)
+                print(self.board)
                 if win:
                     self.winner = 2
                     self.board.playing = False
@@ -57,9 +60,10 @@ class RecordedGame(Game):
 
 if __name__ == '__main__':
     b = Board()
-    p1 = Player(1, b)
-    p2 = Player(2, b)
-    g = RecordedGame(b, p1, p2)
+    model = load_model('my_first_model.h5')
+    p1 = Player(1, b, model, 0.1)
+    p2 = Player(2, b, model, 0.1)
+    g = RecordedAIGame(b, p1, p2)
     g.initialize()
     g.play_a_game()
     print(g.export_final_results())
