@@ -21,11 +21,11 @@ if __name__ == '__main__':
     input_size = 2
     hidden_size = 256
     num_classes = 7
-    num_epochs = 50
+    num_epochs = 25
     num_games = 250
-    batch_size = 4
+    batch_size = 100
     learning_rate = 0.001
-    mcts_iter = 50
+    mcts_iter = 1
     model = train(input_size, hidden_size, num_classes, num_epochs,
                   num_games, batch_size, learning_rate, mcts_iter)
     model.save('my_little_model.h5')
