@@ -1,4 +1,4 @@
-from multiprocessing import Queue
+from queue import Queue
 from src.SingleMCTS import SingleMonteCarloTreeSearch
 
 
@@ -22,5 +22,6 @@ class MonteCarloTreeSearchArch():
         for col in available_moves:
             self.queues_in[col].put((board, player, col))
         for col in available_moves:
-            rollout_policy[col], wins = self.queues_out[col].get()
+            if not self.queues_out[col].empty():
+                rollout_policy[col], wins = self.queues_out[col].get()
         return rollout_policy

@@ -44,7 +44,7 @@ class NNPlayer():
                 return random.choices(
                     list(nn_policy.keys()), list(nn_policy.values()))[0]
             else:
-                return random.choice(nn_policy.keys())
+                return random.choice(list(nn_policy.keys()))
         else:
             best_move = sorted(nn_policy.items(), key=lambda x: x[1])[-1][0]
             return best_move

@@ -1,5 +1,6 @@
 #import torch
-from multiprocessing import Queue
+import time
+from queue import Queue
 from src.MCTSArch import MonteCarloTreeSearchArch
 
 
@@ -58,7 +59,9 @@ class NNRecordedGame_mp():
         state = self.board.board_as_tensor(player.name)
         #state = state.to(self.device, dtype=torch.float64)
         self.history[player.name]['states'].append(state)
+        start_t = time.time()
         rollout_policy = self.mcts.tree_search(self.board, player)
+        print('ELapsed: ', time.time() - start_t)
         self.history[player.name]['rollout_pol'].append(rollout_policy)
         move, win = player.play()
         #self.history[player.name]['moves'].append(move.col)

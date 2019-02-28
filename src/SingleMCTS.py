@@ -1,13 +1,14 @@
 from copy import deepcopy
-from multiprocessing import Process, Queue
+from threading import Thread
+from queue import Queue
 from src.NNPlayer import NNPlayer
 from src.Game import Game
 
 
-class SingleMonteCarloTreeSearch(Process):
+class SingleMonteCarloTreeSearch(Thread):
     def __init__(self, col: int, n_iter: int,
                  queue_in: Queue, queue_out: Queue):
-        Process.__init__(self)
+        Thread.__init__(self)
         self.col = col
         self.n_iter = n_iter
         self.queue_in = queue_in

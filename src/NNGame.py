@@ -1,4 +1,5 @@
 #import torch
+import time
 from src.MCTS import MonteCarloTreeSearch
 
 
@@ -55,7 +56,9 @@ class NNRecordedGame():
         state = self.board.board_as_tensor(player.name)
         self.history[player.name]['states'].append(state)
         mcts = MonteCarloTreeSearch(self.board, player, self.n_iter)
+        start_time = time.time()
         rollout_policy = mcts.tree_search()
+        print('Elapsed: ', time.time()-start_time)
         self.history[player.name]['rollout_pol'].append(rollout_policy)
         move, win = player.play()
         return win

@@ -6,6 +6,7 @@ from keras.layers import Conv2D, BatchNormalization, ReLU, Flatten, Dense
 import keras
 from src.NNPlayer import NNPlayer
 from src.NNGame import NNRecordedGame
+from src.NNGame_mp import NNRecordedGame_mp
 from src.Board import Board
 
 
@@ -62,6 +63,7 @@ def train(input_size: int, hidden_size: int, num_classes: int,
     # Create the model
     input_shape = (6, 7, 2)
     model = model_structure(hidden_size, input_shape)
+    model._make_predict_function()
 
     # Train the model
     for e in range(num_games):
@@ -72,7 +74,7 @@ def train(input_size: int, hidden_size: int, num_classes: int,
         # Create the players and the game
         p1 = NNPlayer(1, b, model, training=True)
         p2 = NNPlayer(2, b, model, training=True)
-        nn_g = NNRecordedGame(b, p1, p2, mcts_iter)
+        nn_g = NNRecordedGame_mp(b, p1, p2, mcts_iter)
         nn_g.initialize()
 
         # Play the game
