@@ -53,21 +53,9 @@ class NNRecordedGame():
 
     def turn(self, player):
         state = self.board.board_as_tensor(player.name)
-        #state = state.to(self.device, dtype=torch.float64)
         self.history[player.name]['states'].append(state)
         mcts = MonteCarloTreeSearch(self.board, player, self.n_iter)
         rollout_policy = mcts.tree_search()
-        roll_pol = [0] * len(rollout_policy)
-        for k, v in rollout_policy.items():
-            roll_pol[k] = v
-        self.history[player.name]['rollout_pol'].append(roll_pol)
+        self.history[player.name]['rollout_pol'].append(rollout_policy)
         move, win = player.play()
-        #self.history[player.name]['moves'].append(move.col)
         return win
-
-    def one_move(self, move):
-        if self.board.playing and not self.board.full:
-            p1move, win = self.player_one.play(move)
-            if win:
-                self.winner = self.player_one.name
-                self.board.playing = False
