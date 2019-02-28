@@ -18,17 +18,15 @@ if __name__ == '__main__human':
 if __name__ == '__main__':
     print('Neural Network Training')
     # Hyper-parameters
-    input_size = 2
-    hidden_size = 256
-    num_classes = 7
+    n_res_blocks = 1
     num_epochs = 25
     num_games = 250
     batch_size = 100
     learning_rate = 0.001
     mcts_iter = 150
-    model = train(input_size, hidden_size, num_classes, num_epochs,
-                  num_games, batch_size, learning_rate, mcts_iter)
-    model.save('my_little_model.h5')
+    model = train(n_res_blocks, num_epochs, num_games,
+                  batch_size, learning_rate, mcts_iter)
+    # model.save('my_little_model.h5')
 
     print('\n\nSample Game\n\n')
     b = Board()

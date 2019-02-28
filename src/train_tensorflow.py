@@ -1,13 +1,12 @@
 import random
 import time
 import numpy as np
-from keras.models import Sequential
-from keras.layers import Conv2D, BatchNormalization, ReLU, Flatten, Dense
-import keras
-from src.NNPlayer import NNPlayer
+import tensorflow as tf
+from src.tfPlayer import tfPlayer
 from src.NNGame import NNRecordedGame
 from src.NNGame_mp import NNRecordedGame_mp
 from src.Board import Board
+from src.tensorflow_network import AlphaGo19Net
 
 
 def sample_player_moves(nn_game, player, batch_size):
@@ -31,83 +30,79 @@ def get_all_player_moves(nn_game, player):
     return input_data, output_data
 
 
-def model_structure(hidden_size, input_shape):
-    model = Sequential()
-    model.add(Conv2D(hidden_size, kernel_size=(4, 4), activation='relu',
-                     padding='same', input_shape=input_shape,
-                     kernel_initializer='normal'))
-    model.add(BatchNormalization())
-    model.add(Conv2D(hidden_size, kernel_size=(4, 4),
-                     padding='same', activation='relu',
-                     kernel_initializer='normal'))
-    model.add(BatchNormalization())
-    model.add(Conv2D(hidden_size, kernel_size=(4, 4),
-                     padding='same', activation='relu',
-                     kernel_initializer='normal'))
-    model.add(BatchNormalization())
-    model.add(Flatten())
-    model.add(Dense(7, kernel_initializer='normal'))
+def train(n_res_blocks: int, num_epochs: int, num_games: int,
+          batch_size: int, learning_rate: float, mcts_iter: int):
 
-    model.compile(loss=keras.losses.mean_squared_error,
-                  optimizer='adam', metrics=['accuracy'])
-    return model
+    # log directory
+    logs_path = '/tmp/tensorflow_logs/example/'
 
+    # Placeholder for input_data
+    inputs = tf.placeholder(tf.float32, [None, 6, 7, 2], name='InputData')
 
-def build_batch(a, n_splits):
-    return a[: len(a) - len(a) % n_splits]
+    # Placeholder for p
+    p = tf.placeholder(tf.float32, [None, 7], name='p')
 
+    # Neural Network
+    pred, loss, optimizer, acc = AlphaGo19Net(
+        inputs, p, n_res_blocks, learning_rate)
 
-def train(input_size: int, hidden_size: int, num_classes: int,
-          num_epochs: int, num_games: int, batch_size: int,
-          learning_rate: float, mcts_iter: int):
-    # Create the model
-    input_shape = (6, 7, 2)
-    model = model_structure(hidden_size, input_shape)
-    model._make_predict_function()
+    # Initialize the variables
+    init = tf.global_variables_initializer()
+
+    # Create a summary to monitor cost tensor
+    tf.summary.scalar("loss", loss)
+    # Create a summary to monitor accuracy tensor
+    tf.summary.scalar("accuracy", acc)
+    # Merge all summaries into a single op
+    merged_summary_op = tf.summary.merge_all()
+
+    print("Run the command line:\n"
+          "--> tensorboard --logdir=/tmp/tensorflow_logs \n"
+          "Then open http://0.0.0.0:6006/ into your web browser")
 
     # Train the model
-    for e in range(num_games):
+    with tf.Session() as sess:
 
-        # Create the board
-        b = Board()
+        # Run the initializer
+        sess.run(init)
 
-        # Create the players and the game
-        p1 = NNPlayer(1, b, model, training=True)
-        p2 = NNPlayer(2, b, model, training=True)
-        nn_g = NNRecordedGame_mp(b, p1, p2, mcts_iter)
-        nn_g.initialize()
+        for e in range(num_games):
 
-        # Play the game
-        nn_g.play_a_game(True)
+            # Create the board
+            b = Board()
 
-        # Get all winner's moves
-        # if nn_g.winner == p1.name:
-        #     input_data, output_data = get_all_player_moves(nn_g, p1)
-        # elif nn_g.winner == p2.name:
-        #     input_data, output_data = get_all_player_moves(nn_g, p2)
-        # else:
-        input_p1, output_p1 = get_all_player_moves(nn_g, p1)
-        input_p2, output_p2 = get_all_player_moves(nn_g, p2)
-        input_data = np.concatenate([input_p1, input_p2])
-        output_data = np.concatenate([output_p1, output_p2])
+            # op to write logs to Tensorboard
+            summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
 
-        # build the batch
-        step = int(len(input_data) / batch_size)
-        if step > 0:
-            input_data = build_batch(input_data, step)
-            output_data = build_batch(output_data, step)
-            e_batch_size = batch_size
-        else:
-            e_batch_size = len(input_data)
+            # Create the players and the game
+            p1 = tfPlayer(1, b, sess, pred, inputs, training=True)
+            p2 = tfPlayer(2, b, sess, pred, inputs, training=True)
+            #nn_g = NNRecordedGame_mp(b, p1, p2, mcts_iter)
+            nn_g = NNRecordedGame(b, p1, p2, mcts_iter)
+            nn_g.initialize()
 
-        # fit the model
-        model.fit(input_data, output_data,
-                  batch_size=e_batch_size,
-                  epochs=num_epochs * (e + 1),
-                  initial_epoch=num_epochs * e,
-                  verbose=1)
+            # Play the game
+            nn_g.play_a_game(True)
 
-        # save the model every 100 games played
-        if e and e % 100 == 0:
-            model.save(f'{round(time.time())}_my_model.h5')
-    return model
+            # Collect the results
+            input_p1, output_p1 = get_all_player_moves(nn_g, p1)
+            input_p2, output_p2 = get_all_player_moves(nn_g, p2)
+            input_data = np.concatenate([input_p1, input_p2])
+            output_data = np.concatenate([output_p1, output_p2])
+
+            # Training cycle
+            for epoch in range(num_epochs):
+                # fit the model
+                _, c, summary = sess.run(
+                    [optimizer, loss, merged_summary_op],
+                    feed_dict={inputs: input_data, p: output_data})
+
+                # Write logs at every iteration
+                summary_writer.add_summary(summary, e)
+
+                if (epoch + 1) % 25 == 0:
+                    print("Epoch:", '%04d' % (epoch + 1), "cost=", "{:.9f}".format(c))
+
+            # save the model every 100 games played
+            #if e and e % 100 == 0:
+            #    model.save(f'{round(time.time())}_my_model.h5')
