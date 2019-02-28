@@ -40,8 +40,11 @@ class NNPlayer():
         nn_policy = {k: v + sum_unavail_moves if k in available_moves
                      else 0.0 for k, v in nn_policy.items()}
         if self.training:
-            return random.choices(
-                list(nn_policy.keys()), list(nn_policy.values()))[0]
+            if sum(nn_policy.values()) > 0.0:
+                return random.choices(
+                    list(nn_policy.keys()), list(nn_policy.values()))[0]
+            else:
+                return random.choice(nn_policy.keys())
         else:
             best_move = sorted(nn_policy.items(), key=lambda x: x[1])[-1][0]
             return best_move
