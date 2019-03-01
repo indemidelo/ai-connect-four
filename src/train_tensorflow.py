@@ -60,6 +60,9 @@ def train(n_res_blocks: int, num_epochs: int, num_games: int,
           "--> tensorboard --logdir=/tmp/tensorflow_logs \n"
           "Then open http://0.0.0.0:6006/ into your web browser")
 
+    # Add ops to save and restore all the variables
+    saver = tf.train.Saver()
+
     # Train the model
     with tf.Session() as sess:
 
@@ -77,12 +80,12 @@ def train(n_res_blocks: int, num_epochs: int, num_games: int,
             # Create the players and the game
             p1 = tfPlayer(1, b, sess, pred, inputs, training=True)
             p2 = tfPlayer(2, b, sess, pred, inputs, training=True)
-            nn_g = NNRecordedGame_mp(b, p1, p2, mcts_iter)
+            nn_g = NNRecordedGame(b, p1, p2, mcts_iter)
             #nn_g = NNRecordedGame(b, p1, p2, mcts_iter)
             nn_g.initialize()
 
             # Play the game
-            nn_g.play_a_game(True)
+            nn_g.play_a_game(print_board=False)
 
             # Collect the results
             input_p1, output_p1 = get_all_player_moves(nn_g, p1)
@@ -100,9 +103,13 @@ def train(n_res_blocks: int, num_epochs: int, num_games: int,
                 # Write logs at every iteration
                 summary_writer.add_summary(summary, e)
 
-                if (epoch + 1) % 25 == 0:
-                    print("Epoch:", '%04d' % (epoch + 1), "cost=", "{:.9f}".format(c))
+                # Save the model
+                saver.save(
+                    sess, f"models/my_little_model_game_{e}_epoch_{epoch}.ckpt")
 
-            # save the model every 100 games played
-            #if e and e % 100 == 0:
-            #    model.save(f'{round(time.time())}_my_model.h5')
+                if (epoch + 1) % 25 == 0:
+                    print(f"Epoch: {epoch+1} - cost= {c}")
+
+            if (e + 1) % 25 == 0:
+                print(f"Game: {e+1} completed")
+    return sess, pred, inputs

@@ -1,7 +1,8 @@
 #from src.train import train
+import tensorflow as tf
 from src.Board import Board
 from src.HumanPlayer import HumanPlayer
-from src.NNPlayer import NNPlayer
+from src.tfPlayer import tfPlayer
 from src.NNGame import NNRecordedGame
 from src.Game import Game
 from src.RLPlayer import RLPlayer
@@ -20,19 +21,23 @@ if __name__ == '__main__':
     # Hyper-parameters
     n_res_blocks = 1
     num_epochs = 2
-    num_games = 250
+    num_games = 1
     batch_size = 100
     learning_rate = 0.001
-    mcts_iter = 2
-    model = train(n_res_blocks, num_epochs, num_games,
-                  batch_size, learning_rate, mcts_iter)
+    mcts_iter = 1
+    _, pred, inputs = train(
+        n_res_blocks, num_epochs, num_games,
+        batch_size, learning_rate, mcts_iter)
     # model.save('my_little_model.h5')
 
-    print('\n\nSample Game\n\n')
-    b = Board()
-    p1 = NNPlayer(1, b, model, training=False)
-    p2 = NNPlayer(2, b, model, training=False)
+    init = tf.global_variables_initializer()
+    with tf.Session() as sess:
+        sess.run(init)
+        print('\n\nSample Game\n\n')
+        b = Board()
+        p1 = tfPlayer(1, b, sess, pred, inputs, training=False)
+        p2 = tfPlayer(2, b, sess, pred, inputs, training=False)
 
-    nn_g = NNRecordedGame(b, p1, p2, mcts_iter)
-    nn_g.initialize()
-    nn_g.play_a_game(print_board=True)
+        nn_g = NNRecordedGame(b, p1, p2, 1)
+        nn_g.initialize()
+        nn_g.play_a_game(print_board=True)

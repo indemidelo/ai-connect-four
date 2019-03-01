@@ -1,4 +1,5 @@
 from queue import Queue
+from copy import deepcopy
 from src.SingleMCTS import SingleMonteCarloTreeSearch
 
 
@@ -8,6 +9,7 @@ class MonteCarloTreeSearchArch():
         self.queues_in = [Queue()] * 7
         self.queues_out = [Queue()] * 7
         self.processes = list()
+        self.rewards = {j: 0.0 for j in range(7)}
 
     def initialize(self):
         for j in range(7):
@@ -18,10 +20,18 @@ class MonteCarloTreeSearchArch():
 
     def tree_search(self, board, player):
         available_moves = board.list_available_moves()
-        rollout_policy = [0.0] * 7
         for col in available_moves:
-            self.queues_in[col].put((board, player, col))
+            self.queues_in[col].put((deepcopy(board), player))
         for col in available_moves:
             if not self.queues_out[col].empty():
-                rollout_policy[col], wins = self.queues_out[col].get()
+                self.rewards[col], wins = self.queues_out[col].get()
+        policy = self.rewards_to_policy()
+        return policy
+
+    def rewards_to_policy(self):
+        min_rp = abs(min(self.rewards.values()))
+        rollout_policy = {k: v + min_rp for k, v in self.rewards.items()}
+        sum_policy = sum(rollout_policy.values()) or 1.0
+        rollout_policy = [v / sum_policy if k in self.rewards else 0.0
+                          for k, v in rollout_policy.items()]
         return rollout_policy
