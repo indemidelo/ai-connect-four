@@ -5,12 +5,12 @@ from src.Board import Board
 
 class tfPlayer():
     def __init__(self, name: int, board: Board,
-                 sess, logits, input_placeholder,
+                 sess, pred, input_placeholder,
                  training: bool = False):
         self.name = name
         self.board = board
         self.sess = sess
-        self.logits = logits
+        self.pred = pred
         self.input_placeholder = input_placeholder
         self.training = training
 
@@ -34,7 +34,7 @@ class tfPlayer():
             return -1
         input_data = self.board.board_as_tensor(self.name)
         nn_policy = self.sess.run(
-            [self.logits], feed_dict={self.input_placeholder: input_data})
+            [self.pred], feed_dict={self.input_placeholder: input_data})[0][0]
         min_nnp = abs(min(nn_policy))
         nn_policy = {j: v + min_nnp for j, v in enumerate(nn_policy)}
         sum_policy = sum(nn_policy.values()) or 1.0

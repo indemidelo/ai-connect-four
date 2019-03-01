@@ -1,21 +1,20 @@
 from copy import deepcopy
-from src.NNPlayer import NNPlayer
+from src.tfPlayer import tfPlayer
 from src.Player import Player
 from src.Game import Game
 
 
 class MonteCarloTreeSearch():
-    def __init__(self, board, nn_player: NNPlayer, n_iter):
+    def __init__(self, board, tf_player: tfPlayer, n_iter):
         self.board = board
-        self.player = nn_player
+        self.player = tf_player
         self.n_iter = n_iter
-        self.rewards = dict()
+        self.rewards = {j: 0.0 for j in range(7)}
         self.wins = 0
 
     def tree_search(self):
         available_moves = self.board.list_available_moves()
         for col in available_moves:
-            self.rewards[col] = 0.0
             for j in range(self.n_iter):
                 winner, n_new_plays = self.rollout_game(col)
                 if winner == self.player.name:
@@ -37,8 +36,10 @@ class MonteCarloTreeSearch():
 
     def rollout_game(self, col):
         new_b = deepcopy(self.board)
-        p1dummy = NNPlayer(
-            self.player.name, new_b, self.player.model, True)
+        p1dummy = tfPlayer(
+            self.player.name, new_b,
+            self.player.sess, self.player.pred,
+            self.player.input_placeholder, True)
         opponent = 1 if self.player.name == 2 else 2
         p2dummy = Player(opponent, new_b)
         g = Game(new_b, p1dummy, p2dummy)

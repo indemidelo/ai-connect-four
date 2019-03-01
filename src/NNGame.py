@@ -1,5 +1,6 @@
 #import torch
 import time
+import numpy as np
 from src.MCTS import MonteCarloTreeSearch
 
 
@@ -21,11 +22,9 @@ class NNRecordedGame():
 
     def initialize(self):
         self.history[self.player_one.name] = {
-            'moves': list(), 'states': list(), 'rollout_pol': list()
-        }
+            'states': [], 'rollout_pol': []}
         self.history[self.player_two.name] = {
-            'moves': list(), 'states': list(), 'rollout_pol': list()
-        }
+            'states': [], 'rollout_pol': []}
 
     def play_a_game(self, print_board=False, first_move=None):
         """ To play a game """

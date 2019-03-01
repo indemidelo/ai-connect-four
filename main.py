@@ -19,11 +19,11 @@ if __name__ == '__main__':
     print('Neural Network Training')
     # Hyper-parameters
     n_res_blocks = 1
-    num_epochs = 25
+    num_epochs = 2
     num_games = 250
     batch_size = 100
     learning_rate = 0.001
-    mcts_iter = 150
+    mcts_iter = 2
     model = train(n_res_blocks, num_epochs, num_games,
                   batch_size, learning_rate, mcts_iter)
     # model.save('my_little_model.h5')

@@ -25,7 +25,7 @@ def sample_player_moves(nn_game, player, batch_size):
 def get_all_player_moves(nn_game, player):
     input_data = np.asarray(nn_game.history[player.name]['states'])
     input_data = input_data.reshape((-1, 6, 7, 2))
-    output_data = np.asarray(nn_game.history[player.name]['rollout_pol'])
+    output_data = np.array(nn_game.history[player.name]['rollout_pol'])
     output_data = output_data.reshape((-1, 7))
     return input_data, output_data
 
@@ -77,8 +77,8 @@ def train(n_res_blocks: int, num_epochs: int, num_games: int,
             # Create the players and the game
             p1 = tfPlayer(1, b, sess, pred, inputs, training=True)
             p2 = tfPlayer(2, b, sess, pred, inputs, training=True)
-            #nn_g = NNRecordedGame_mp(b, p1, p2, mcts_iter)
-            nn_g = NNRecordedGame(b, p1, p2, mcts_iter)
+            nn_g = NNRecordedGame_mp(b, p1, p2, mcts_iter)
+            #nn_g = NNRecordedGame(b, p1, p2, mcts_iter)
             nn_g.initialize()
 
             # Play the game

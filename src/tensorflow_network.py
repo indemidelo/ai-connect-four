@@ -1,5 +1,4 @@
 import tensorflow as tf
-from keras.layers import BatchNormalization
 
 
 def ResidualBlock(input):
@@ -13,7 +12,7 @@ def ResidualBlock(input):
     )
 
     # Batch normalization #1
-    batchnorm1 = tf.nn.batch_normalization(conv1)
+    batchnorm1 = tf.layers.batch_normalization(conv1)
 
     # ReLU #1
     relu1 = tf.nn.relu(batchnorm1)
@@ -28,7 +27,7 @@ def ResidualBlock(input):
     )
 
     # Batch normalization #2
-    batchnorm2 = BatchNormalization(conv2)
+    batchnorm2 = tf.layers.batch_normalization(conv2)
 
     # Skip connection
     skip = tf.add(batchnorm2, input)
@@ -58,7 +57,7 @@ def AlphaGo19Net(inputs, labels, n_res_blocks, learning_rate):
     )
 
     # Batch normalization layer #1
-    batchnorm1 = tf.nn.batch_normalization(conv1)
+    batchnorm1 = tf.layers.batch_normalization(conv1)
 
     # ReLU layer #1
     relu2 = tf.nn.relu(batchnorm1)
@@ -67,7 +66,7 @@ def AlphaGo19Net(inputs, labels, n_res_blocks, learning_rate):
     tower = ResidualTower(relu2, n_res_blocks)
 
     # Convolutional layer #3
-    conv3 = tf.nn.conv2d(
+    conv3 = tf.layers.conv2d(
         inputs=tower,
         filters=2,
         kernel_size=[1, 1],
@@ -76,18 +75,20 @@ def AlphaGo19Net(inputs, labels, n_res_blocks, learning_rate):
     )
 
     # Batch normalization layer #4
-    batchnorm4 = BatchNormalization(conv3)
+    batchnorm4 = tf.layers.batch_normalization(conv3)
 
     # ReLU layer #4
     relu4 = tf.nn.relu(batchnorm4)
 
     # Fully connected layer
     with tf.name_scope('Predicted'):
+        relu4 = tf.reshape(relu4, [-1, 6 * 7 * 2])
         pred = tf.layers.dense(inputs=relu4, units=7)
 
     # Loss
     with tf.name_scope('Loss'):
-        loss = tf.losses.mean_squared_error(labels=labels, logits=pred)
+        loss = tf.losses.mean_squared_error(
+            labels=labels, predictions=pred)
 
     # Configure optimizer
     with tf.name_scope('Adam'):
