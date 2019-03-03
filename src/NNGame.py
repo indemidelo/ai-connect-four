@@ -57,7 +57,7 @@ class NNRecordedGame():
         mcts = MonteCarloTreeSearch(self.board, player, self.n_iter)
         start_time = time.time()
         rollout_policy = mcts.tree_search()
-        print('Elapsed: ', time.time()-start_time)
+        # print('Elapsed: ', time.time()-start_time)
         self.history[player.name]['rollout_pol'].append(rollout_policy)
         move, win = player.play()
         return win

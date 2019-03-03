@@ -61,7 +61,7 @@ class NNRecordedGame_mp():
         self.history[player.name]['states'].append(state)
         start_t = time.time()
         rollout_policy = self.mcts.tree_search(self.board, player)
-        print('ELapsed: ', time.time() - start_t)
+        # print('ELapsed: ', time.time() - start_t)
         self.history[player.name]['rollout_pol'].append(rollout_policy)
         move, win = player.play()
         #self.history[player.name]['moves'].append(move.col)
