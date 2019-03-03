@@ -41,8 +41,7 @@ def ResidualBlock(input):
 def ResidualTower(input, n_blocks):
     res = input
     for _ in range(n_blocks):
-        res = ResidualBlock(input)
-        input = res
+        res = ResidualBlock(res)
     return res
 
 
