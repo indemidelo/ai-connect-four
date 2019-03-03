@@ -22,9 +22,12 @@ class MonteCarloTreeSearchArch():
         available_moves = board.list_available_moves()
         for col in available_moves:
             self.queues_in[col].put((deepcopy(board), player))
-        for col in available_moves:
-            if not self.queues_out[col].empty():
-                self.rewards[col], wins = self.queues_out[col].get()
+        results_to_collect = deepcopy(available_moves)
+        while results_to_collect:
+            for col in results_to_collect:
+                if not self.queues_out[col].empty():
+                    self.rewards[col], wins = self.queues_out[col].get()
+                    results_to_collect.remove(col)
         policy = self.rewards_to_policy()
         return policy
 
