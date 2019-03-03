@@ -46,13 +46,14 @@ def train(n_res_blocks: int, num_epochs: int, num_games: int,
     pred, loss, optimizer, acc = AlphaGo19Net(
         inputs, p, n_res_blocks, learning_rate)
 
+    # Create a summary to monitor cost tensor
+    tf.summary.scalar("Loss", loss)
+    # Create a summary to monitor accuracy tensor
+    tf.summary.scalar("Accuracy", acc)
+
     # Initialize the variables
     init = tf.global_variables_initializer()
 
-    # Create a summary to monitor cost tensor
-    tf.summary.scalar("loss", loss)
-    # Create a summary to monitor accuracy tensor
-    tf.summary.scalar("accuracy", acc)
     # Merge all summaries into a single op
     merged_summary_op = tf.summary.merge_all()
 
@@ -80,8 +81,8 @@ def train(n_res_blocks: int, num_epochs: int, num_games: int,
             # Create the players and the game
             p1 = tfPlayer(1, b, sess, pred, inputs, training=True)
             p2 = tfPlayer(2, b, sess, pred, inputs, training=True)
+            # nn_g = NNRecordedGame(b, p1, p2, mcts_iter)
             nn_g = NNRecordedGame(b, p1, p2, mcts_iter)
-            #nn_g = NNRecordedGame(b, p1, p2, mcts_iter)
             nn_g.initialize()
 
             # Play the game
@@ -95,21 +96,24 @@ def train(n_res_blocks: int, num_epochs: int, num_games: int,
 
             # Training cycle
             for epoch in range(num_epochs):
+                # feed dict
+                feed_dict = {inputs: input_data, p: output_data}
+
                 # fit the model
-                _, c, summary = sess.run(
-                    [optimizer, loss, merged_summary_op],
-                    feed_dict={inputs: input_data, p: output_data})
+                _, c, accuracy, summary = sess.run(
+                    [optimizer, loss, acc, merged_summary_op],
+                    feed_dict=feed_dict)
 
                 # Write logs at every iteration
                 summary_writer.add_summary(summary, e)
 
                 # Save the model
-                saver.save(
-                    sess, f"models/my_little_model_game_{e}_epoch_{epoch}.ckpt")
+                # saver.save(
+                #     sess, f"models/my_little_model_game_{e}_epoch_{epoch}.ckpt")
 
-                if (epoch + 1) % 25 == 0:
-                    print(f"Epoch: {epoch+1} - cost= {c}")
+                # if (epoch + 1) % 25 == 0:
+                print(f"Epoch: {epoch+1} - cost= {c}")
+                print('Accuracy: ', accuracy)
 
-            if (e + 1) % 25 == 0:
-                print(f"Game: {e+1} completed")
+            print(f"Game: {e+1} completed")
     return sess, pred, inputs
